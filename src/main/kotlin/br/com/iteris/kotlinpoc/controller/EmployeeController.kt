@@ -2,6 +2,7 @@ package br.com.iteris.kotlinpoc.controller
 
 import br.com.iteris.kotlinpoc.model.entity.Employee
 import br.com.iteris.kotlinpoc.model.repository.EmployeeRepository
+import br.com.iteris.kotlinpoc.utils.convertStringToLong
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -9,7 +10,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
-import java.util.Objects.nonNull
 
 const val PATH = "/employees"
 
@@ -17,28 +17,24 @@ const val PATH = "/employees"
 @RequestMapping(PATH)
 class EmployeeController {
 
-    val log: Logger = LoggerFactory.getLogger(EmployeeController().javaClass.simpleName)
+    val log: Logger = LoggerFactory.getLogger(this.javaClass.simpleName)
 
     @Autowired
     lateinit var employeeRepository: EmployeeRepository
 
     @GetMapping("/{id}")
     fun getEmployeeById(@PathVariable id: String): ResponseEntity<Employee> {
-        val idLong: Long? = try {
-            id.toLong()
-        } catch (exception: NumberFormatException) {
+        val idLong: Long? = convertStringToLong(id) { exception ->
             log.error(exception.message, exception)
-            null
         }
-        return if (nonNull(idLong)) {
-            idLong!!.let {
-                employeeRepository.findById(it)
+
+        idLong?.let {
+            return employeeRepository.findById(it)
                         .map { employee -> ResponseEntity.ok(employee) }
                         .orElseGet { ResponseEntity.notFound().build() }
-            }
-        } else {
-            ResponseEntity(HttpStatus.BAD_REQUEST)
         }
+
+        return ResponseEntity(HttpStatus.BAD_REQUEST)
     }
 
     @GetMapping
