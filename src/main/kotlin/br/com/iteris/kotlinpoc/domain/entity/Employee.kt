@@ -1,4 +1,4 @@
-package br.com.iteris.kotlinpoc.model.entity
+package br.com.iteris.kotlinpoc.domain.entity
 
 import java.math.BigDecimal
 import javax.persistence.Entity

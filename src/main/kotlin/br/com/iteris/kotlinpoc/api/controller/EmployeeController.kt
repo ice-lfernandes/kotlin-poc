@@ -1,7 +1,8 @@
-package br.com.iteris.kotlinpoc.controller
+package br.com.iteris.kotlinpoc.api.controller
 
-import br.com.iteris.kotlinpoc.model.entity.Employee
-import br.com.iteris.kotlinpoc.model.repository.EmployeeRepository
+import br.com.iteris.kotlinpoc.domain.entity.Employee
+import br.com.iteris.kotlinpoc.service.EmployeeService
+import br.com.iteris.kotlinpoc.service.dto.EmployeeDTO
 import br.com.iteris.kotlinpoc.utils.convertStringToLong
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -17,19 +18,19 @@ const val PATH = "/employees"
 @RequestMapping(PATH)
 class EmployeeController {
 
-    val log: Logger = LoggerFactory.getLogger(this.javaClass.simpleName)
+    private val log: Logger = LoggerFactory.getLogger(EmployeeController::javaClass.name)
 
     @Autowired
-    lateinit var employeeRepository: EmployeeRepository
+    lateinit var employeeService: EmployeeService
 
     @GetMapping("/{id}")
-    fun getEmployeeById(@PathVariable id: String): ResponseEntity<Employee> {
+    fun getEmployeeById(@PathVariable id: String): ResponseEntity<EmployeeDTO> {
         val idLong: Long? = convertStringToLong(id) { exception ->
             log.error(exception.message, exception)
         }
 
         idLong?.let {
-            return employeeRepository.findById(it)
+            return employeeService.findById(it)
                         .map { employee -> ResponseEntity.ok(employee) }
                         .orElseGet { ResponseEntity.notFound().build() }
         }
@@ -38,12 +39,13 @@ class EmployeeController {
     }
 
     @GetMapping
-    fun getEmployee(): ResponseEntity<List<Employee>> = ResponseEntity.ok(employeeRepository.findAll().toList())
+    fun getEmployee(): ResponseEntity<List<Employee>> = ResponseEntity.ok(employeeService.findAll().toList())
 
     @PostMapping
-    fun postEmployee(@RequestBody employeeDTOForm: Employee, uriComponentBuilder: UriComponentsBuilder): ResponseEntity<Employee> {
+    fun postEmployee(@RequestBody employeeDTOForm: Employee,  uriComponentBuilder: UriComponentsBuilder): ResponseEntity<Employee> {
+        val employeeSaved = employeeService.save(employeeDTOForm)
         val uri = uriComponentBuilder.path("$PATH/{id}").buildAndExpand(employeeDTOForm.id).toUri()
-        return ResponseEntity.created(uri).body(employeeDTOForm)
+        return ResponseEntity.created(uri).body(employeeSaved)
     }
 
     @PutMapping("/{id}")

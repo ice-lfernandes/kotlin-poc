@@ -1,4 +1,4 @@
-package br.com.iteris.kotlinpoc.extensions
+package br.com.iteris.kotlinpoc.utils.extensions
 
 fun Boolean.isTrue(block: (Boolean) -> Unit) : Boolean {
     if (this)
