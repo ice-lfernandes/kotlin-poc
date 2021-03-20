@@ -1,9 +1,9 @@
 package br.com.iteris.kotlinpoc.service
 
+import br.com.iteris.kotlinpoc.utils.Mapper
 import br.com.iteris.kotlinpoc.domain.entity.Employee
 import br.com.iteris.kotlinpoc.domain.repository.EmployeeRepository
 import br.com.iteris.kotlinpoc.service.dto.EmployeeDTO
-import org.modelmapper.ModelMapper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,13 +18,10 @@ class EmployeeService {
     @Autowired
     lateinit var employeeRepository: EmployeeRepository
 
-    @Autowired
-    lateinit var modelMapper: ModelMapper
-
     fun findById(id: Long): Optional<EmployeeDTO> =
             employeeRepository.findById(id).map { employee ->
                 log.info("method=findById, stage=employee-found, id=$id, employee=$employee")
-                modelMapper.map(employee, EmployeeDTO::class.java)
+                Mapper.convert<Employee, EmployeeDTO>(employee)
             }
 
     fun findAll(): List<Employee> = employeeRepository.findAll().toList()
