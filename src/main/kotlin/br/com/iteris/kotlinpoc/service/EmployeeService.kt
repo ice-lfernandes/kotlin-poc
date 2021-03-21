@@ -66,7 +66,7 @@ class EmployeeService {
                 employeeRepository.delete(employee)
             } catch (exception: Exception) {
                 log.error("method=delete, stage=error-delete-employee, employeeDTO=$employee, message=${exception.message}", exception)
-                throw exception
+                throw FatalException(message = "Error Delete Employee", exception = exception)
             }
         }, {
             log.warn("method=delete, stage=not-found-employee, id=$id")
