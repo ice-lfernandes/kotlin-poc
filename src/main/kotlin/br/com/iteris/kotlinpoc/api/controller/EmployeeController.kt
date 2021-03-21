@@ -3,6 +3,7 @@ package br.com.iteris.kotlinpoc.api.controller
 import br.com.iteris.kotlinpoc.domain.entity.Employee
 import br.com.iteris.kotlinpoc.service.EmployeeService
 import br.com.iteris.kotlinpoc.service.dto.EmployeeDTO
+import br.com.iteris.kotlinpoc.utils.Mapper
 import br.com.iteris.kotlinpoc.utils.convertStringToLong
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -31,21 +32,21 @@ class EmployeeController {
 
         idLong?.let {
             return employeeService.findById(it)
-                        .map { employee -> ResponseEntity.ok(employee) }
-                        .orElseGet { ResponseEntity.notFound().build() }
+                    .map { employee -> ResponseEntity.ok(employee) }
+                    .orElseGet { ResponseEntity.notFound().build() }
         }
 
         return ResponseEntity(HttpStatus.BAD_REQUEST)
     }
 
     @GetMapping
-    fun getEmployee(): ResponseEntity<List<Employee>> = ResponseEntity.ok(employeeService.findAll().toList())
+    fun getEmployee(): ResponseEntity<List<EmployeeDTO>> = ResponseEntity.ok(employeeService.findAll())
 
     @PostMapping
-    fun postEmployee(@RequestBody employeeDTOForm: Employee,  uriComponentBuilder: UriComponentsBuilder): ResponseEntity<Employee> {
+    fun postEmployee(@RequestBody employeeDTOForm: EmployeeDTO, uriComponentBuilder: UriComponentsBuilder): ResponseEntity<EmployeeDTO> {
         val employeeSaved = employeeService.save(employeeDTOForm)
-        val uri = uriComponentBuilder.path("$PATH/{id}").buildAndExpand(employeeDTOForm.id).toUri()
-        return ResponseEntity.created(uri).body(employeeSaved)
+        val uri = uriComponentBuilder.path("$PATH/{id}").buildAndExpand(employeeSaved.id).toUri()
+        return ResponseEntity.created(uri).body(Mapper.convert(employeeSaved))
     }
 
     @PutMapping("/{id}")
