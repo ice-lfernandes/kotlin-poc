@@ -1,6 +1,5 @@
 package br.com.iteris.kotlinpoc.api.controller
 
-import br.com.iteris.kotlinpoc.domain.entity.Employee
 import br.com.iteris.kotlinpoc.service.EmployeeService
 import br.com.iteris.kotlinpoc.service.dto.EmployeeDTO
 import br.com.iteris.kotlinpoc.utils.Mapper
@@ -43,15 +42,37 @@ class EmployeeController {
     fun getEmployee(): ResponseEntity<List<EmployeeDTO>> = ResponseEntity.ok(employeeService.findAll())
 
     @PostMapping
-    fun postEmployee(@RequestBody employeeDTOForm: EmployeeDTO, uriComponentBuilder: UriComponentsBuilder): ResponseEntity<EmployeeDTO> {
-        val employeeSaved = employeeService.save(employeeDTOForm)
+    fun postEmployee(@RequestBody employeeDTO: EmployeeDTO, uriComponentBuilder: UriComponentsBuilder): ResponseEntity<EmployeeDTO> {
+        val employeeSaved = employeeService.save(employeeDTO)
         val uri = uriComponentBuilder.path("$PATH/{id}").buildAndExpand(employeeSaved.id).toUri()
         return ResponseEntity.created(uri).body(Mapper.convert(employeeSaved))
     }
 
     @PutMapping("/{id}")
-    fun putEmployee(@PathVariable id: String, @RequestBody employeeDTOForm: Employee) {
+    fun putEmployee(@PathVariable id: String, @RequestBody employeeDTO: EmployeeDTO): ResponseEntity<EmployeeDTO> {
+        val idLong: Long? = convertStringToLong(id) { exception ->
+            log.error(exception.message, exception)
+        }
 
+        idLong?.let {
+            return ResponseEntity.ok(employeeService.update(it, employeeDTO))
+        }
+
+        return ResponseEntity(HttpStatus.BAD_REQUEST)
+    }
+
+    @DeleteMapping("/{id}")
+    fun deleteEmployee(@PathVariable id: String): ResponseEntity<EmployeeDTO> {
+        val idLong: Long? = convertStringToLong(id) { exception ->
+            log.error(exception.message, exception)
+        }
+
+        idLong?.let {
+            employeeService.delete(it)
+            return ResponseEntity.ok().build()
+        }
+
+        return ResponseEntity(HttpStatus.BAD_REQUEST)
     }
 
 }

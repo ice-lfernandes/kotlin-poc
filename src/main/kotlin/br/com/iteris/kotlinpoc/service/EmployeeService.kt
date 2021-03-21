@@ -3,6 +3,8 @@ package br.com.iteris.kotlinpoc.service
 import br.com.iteris.kotlinpoc.utils.Mapper
 import br.com.iteris.kotlinpoc.domain.entity.Employee
 import br.com.iteris.kotlinpoc.domain.repository.EmployeeRepository
+import br.com.iteris.kotlinpoc.exception.FatalException
+import br.com.iteris.kotlinpoc.exception.NotFoundEntityException
 import br.com.iteris.kotlinpoc.service.dto.EmployeeDTO
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -31,20 +33,45 @@ class EmployeeService {
             }
 
     @Throws(Exception::class)
-    fun save(employeeDTOForm: EmployeeDTO): Employee {
+    fun save(employeeDTOForm: EmployeeDTO): EmployeeDTO {
         try {
-            return employeeRepository.save(Mapper.convert(employeeDTOForm))
+            val employeePersisted = employeeRepository.save(Mapper.convert(employeeDTOForm))
+            log.info("method=save, stage=employee-persisted-success, employ=$employeePersisted")
+            return Mapper.convert(employeePersisted)
         } catch (exception: Exception) {
             log.error("method=save, stage=error-save-employee, employeeDTO=$employeeDTOForm, message=${exception.message}", exception)
-            throw exception
+            throw FatalException(message = "Error Save Employee", exception = exception)
         }
     }
 
-    @Throws(Exception::class)
-    fun delete(employeeDTOForm: Employee) = try {
-        employeeRepository.delete(employeeDTOForm)
-    } catch (exception: Exception) {
-        log.error("method=delete, stage=error-delete-employee, employeeDTO=$employeeDTOForm, message=${exception.message}", exception)
-        throw exception
+    @Throws(Exception::class, NotFoundEntityException::class)
+    fun update(id: Long, employeeDTOForm: EmployeeDTO): EmployeeDTO {
+        return employeeRepository.findById(id).map {
+            try {
+                val employeePersisted = employeeRepository.save(Mapper.convert(employeeDTOForm))
+                log.info("method=save, stage=employee-persisted-success, employ=$employeePersisted")
+                Mapper.convert<Employee, EmployeeDTO>(employeePersisted)
+            } catch (exception: Exception) {
+                log.error("method=save, stage=error-save-employee, employeeDTO=$employeeDTOForm, message=${exception.message}", exception)
+                throw FatalException(message = "Error Update Employee", exception = exception)
+            }
+        }.orElseThrow { throw NotFoundEntityException(message = "Employee Not Found") }
     }
+
+    @Throws(Exception::class, NotFoundEntityException::class)
+    fun delete(id: Long) {
+        val optionalEmployee = employeeRepository.findById(id)
+        optionalEmployee.ifPresentOrElse({ employee ->
+            try {
+                employeeRepository.delete(employee)
+            } catch (exception: Exception) {
+                log.error("method=delete, stage=error-delete-employee, employeeDTO=$employee, message=${exception.message}", exception)
+                throw exception
+            }
+        }, {
+            log.warn("method=delete, stage=not-found-employee, id=$id")
+            throw NotFoundEntityException(message = "Employee Not Found")
+        })
+    }
+
 }
