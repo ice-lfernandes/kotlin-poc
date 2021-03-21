@@ -48,6 +48,7 @@ class EmployeeService {
     fun update(id: Long, employeeDTOForm: EmployeeDTO): EmployeeDTO {
         return employeeRepository.findById(id).map {
             try {
+                employeeDTOForm.id = it.id
                 val employeePersisted = employeeRepository.save(Mapper.convert(employeeDTOForm))
                 log.info("method=save, stage=employee-persisted-success, employ=$employeePersisted")
                 Mapper.convert<Employee, EmployeeDTO>(employeePersisted)
