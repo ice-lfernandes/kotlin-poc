@@ -31,12 +31,8 @@ class EmployeeController {
     lateinit var employeeService: EmployeeService
 
     @Operation(summary = "Get Employee by Id")
-    @ApiResponse(responseCode = "200", description = "Found Employee", content = [(
-            Content(
-                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = Schema(implementation = EmployeeDTO::class))
-            )])
-    @GetMapping("/{id}")
+    @ApiResponse(responseCode = "200", description = "Found Employee")
+    @GetMapping("/{id}", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getEmployeeById(@PathVariable id: String): ResponseEntity<EmployeeDTO> {
         val idLong: Long? = convertStringToLong(id) { exception ->
             log.error(exception.message, exception)
@@ -52,21 +48,13 @@ class EmployeeController {
     }
 
     @Operation(summary = "Get List of Employees")
-    @ApiResponse(responseCode = "200", description = "Found List of Employees", content = [(
-            Content(
-                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    array = (ArraySchema(schema = Schema(implementation = EmployeeDTO::class)))))
-    ])
-    @GetMapping
+    @ApiResponse(responseCode = "200", description = "Found List of Employees")
+    @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getEmployee(): ResponseEntity<List<EmployeeDTO>> = ResponseEntity.ok(employeeService.findAll())
 
     @Operation(summary = "Post Employee")
-    @ApiResponse(responseCode = "201", description = "Employee Created", content = [(
-            Content(
-                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = Schema(implementation = EmployeeDTO::class)))
-    ])
-    @PostMapping
+    @ApiResponse(responseCode = "201", description = "Employee Created")
+    @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun postEmployee(
             @Valid @RequestBody employeeDTO: EmployeeDTO,
             uriComponentBuilder: UriComponentsBuilder,
@@ -77,12 +65,8 @@ class EmployeeController {
     }
 
     @Operation(summary = "Put Employee")
-    @ApiResponse(responseCode = "200", description = "Employee Updated", content = [(
-            Content(
-                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = Schema(implementation = EmployeeDTO::class)))
-    ])
-    @PutMapping("/{id}")
+    @ApiResponse(responseCode = "200", description = "Employee Updated")
+    @PutMapping("/{id}", consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun putEmployee(@PathVariable id: String, @Valid @RequestBody employeeDTO: EmployeeDTO): ResponseEntity<EmployeeDTO> {
         val idLong: Long? = convertStringToLong(id) { exception ->
             log.error(exception.message, exception)
@@ -96,7 +80,7 @@ class EmployeeController {
     }
 
     @Operation(summary = "Delete Employee")
-    @ApiResponse(responseCode = "200", description = "Employee Deleted", content = [Content()])
+    @ApiResponse(responseCode = "200", description = "Employee Deleted")
     @DeleteMapping("/{id}")
     fun deleteEmployee(@PathVariable id: String): ResponseEntity<Any> {
         val idLong: Long? = convertStringToLong(id) { exception ->
