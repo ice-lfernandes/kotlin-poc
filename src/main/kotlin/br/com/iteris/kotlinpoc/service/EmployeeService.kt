@@ -24,20 +24,26 @@ class EmployeeService {
     fun findById(id: Long): Optional<EmployeeDTO> =
             employeeRepository.findById(id).map { employee ->
                 log.info("method=findById, stage=employee-found, id=$id, employee=$employee")
-                Mapper.convert<Employee, EmployeeDTO>(employee)
+                Mapper.convert<Employee, EmployeeDTO>(employee).apply {
+                    completeDepartamentName(Mapper.convert(employee.departament))
+                }
             }
 
     fun findAll(): List<EmployeeDTO> =
             employeeRepository.findAll().map { employee ->
-                Mapper.convert<Employee, EmployeeDTO>(employee)
+                Mapper.convert<Employee, EmployeeDTO>(employee).apply {
+                    completeDepartamentName(Mapper.convert(employee.departament))
+                }
             }
 
-    @Throws(Exception::class)
+    @Throws(FatalException::class)
     fun save(employeeDTOForm: EmployeeDTO): EmployeeDTO {
         try {
             val employeePersisted = employeeRepository.save(Mapper.convert(employeeDTOForm))
             log.info("method=save, stage=employee-persisted-success, employee=$employeePersisted")
-            return Mapper.convert(employeePersisted)
+            return Mapper.convert<Employee, EmployeeDTO>(employeePersisted).apply {
+                completeDepartamentName(Mapper.convert(employeePersisted.departament))
+            }
         } catch (exception: Exception) {
             log.error("method=save, stage=error-save-employee, employeeDTO=$employeeDTOForm, message=${exception.message}", exception)
             throw FatalException(message = "Error Save Employee", exception = exception)
@@ -51,7 +57,9 @@ class EmployeeService {
                 employeeDTOForm.id = it.id
                 val employeePersisted = employeeRepository.save(Mapper.convert(employeeDTOForm))
                 log.info("method=save, stage=employee-persisted-success, employ=$employeePersisted")
-                Mapper.convert<Employee, EmployeeDTO>(employeePersisted)
+                Mapper.convert<Employee, EmployeeDTO>(employeePersisted).apply {
+                    completeDepartamentName(Mapper.convert(employeePersisted.departament))
+                }
             } catch (exception: Exception) {
                 log.error("method=save, stage=error-save-employee, employeeDTO=$employeeDTOForm, message=${exception.message}", exception)
                 throw FatalException(message = "Error Update Employee", exception = exception)

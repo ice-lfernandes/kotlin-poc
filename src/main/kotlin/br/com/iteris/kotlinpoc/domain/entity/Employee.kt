@@ -3,8 +3,6 @@ package br.com.iteris.kotlinpoc.domain.entity
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import javax.persistence.*
-import javax.validation.constraints.NotBlank
-import javax.validation.constraints.PositiveOrZero
 
 @Entity
 data class Employee(
