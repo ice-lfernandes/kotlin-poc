@@ -4,6 +4,11 @@ import br.com.iteris.kotlinpoc.service.EmployeeService
 import br.com.iteris.kotlinpoc.service.dto.EmployeeDTO
 import br.com.iteris.kotlinpoc.utils.Mapper
 import br.com.iteris.kotlinpoc.utils.convertStringToLong
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.media.ArraySchema
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -25,7 +30,13 @@ class EmployeeController {
     @Autowired
     lateinit var employeeService: EmployeeService
 
-    @GetMapping("/{id}", produces = [MediaType.APPLICATION_JSON_VALUE])
+    @Operation(summary = "Get Employee by Id")
+    @ApiResponse(responseCode = "200", description = "Found Employee", content = [(
+            Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = Schema(implementation = EmployeeDTO::class))
+            )])
+    @GetMapping("/{id}")
     fun getEmployeeById(@PathVariable id: String): ResponseEntity<EmployeeDTO> {
         val idLong: Long? = convertStringToLong(id) { exception ->
             log.error(exception.message, exception)
@@ -40,10 +51,22 @@ class EmployeeController {
         return ResponseEntity(HttpStatus.BAD_REQUEST)
     }
 
-    @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
+    @Operation(summary = "Get List of Employees")
+    @ApiResponse(responseCode = "200", description = "Found List of Employees", content = [(
+            Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    array = (ArraySchema(schema = Schema(implementation = EmployeeDTO::class)))))
+    ])
+    @GetMapping
     fun getEmployee(): ResponseEntity<List<EmployeeDTO>> = ResponseEntity.ok(employeeService.findAll())
 
-    @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
+    @Operation(summary = "Post Employee")
+    @ApiResponse(responseCode = "201", description = "Employee Created", content = [(
+            Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = Schema(implementation = EmployeeDTO::class)))
+    ])
+    @PostMapping
     fun postEmployee(
             @Valid @RequestBody employeeDTO: EmployeeDTO,
             uriComponentBuilder: UriComponentsBuilder,
@@ -53,7 +76,13 @@ class EmployeeController {
         return ResponseEntity.created(uri).body(Mapper.convert(employeeSaved))
     }
 
-    @PutMapping("/{id}", consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
+    @Operation(summary = "Put Employee")
+    @ApiResponse(responseCode = "200", description = "Employee Updated", content = [(
+            Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = Schema(implementation = EmployeeDTO::class)))
+    ])
+    @PutMapping("/{id}")
     fun putEmployee(@PathVariable id: String, @Valid @RequestBody employeeDTO: EmployeeDTO): ResponseEntity<EmployeeDTO> {
         val idLong: Long? = convertStringToLong(id) { exception ->
             log.error(exception.message, exception)
@@ -66,6 +95,8 @@ class EmployeeController {
         return ResponseEntity(HttpStatus.BAD_REQUEST)
     }
 
+    @Operation(summary = "Delete Employee")
+    @ApiResponse(responseCode = "200", description = "Employee Deleted", content = [Content()])
     @DeleteMapping("/{id}")
     fun deleteEmployee(@PathVariable id: String): ResponseEntity<Any> {
         val idLong: Long? = convertStringToLong(id) { exception ->
