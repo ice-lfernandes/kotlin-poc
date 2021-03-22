@@ -5,7 +5,7 @@ package br.com.iteris.kotlinpoc.utils.extensions
  *
  * @return Boolean
  */
-fun Boolean.isTrue(block: (Boolean) -> Unit) : Boolean {
+fun Boolean.isTrue(block: (Boolean) -> Unit): Boolean {
     if (this)
         block(this)
     return this
@@ -16,7 +16,7 @@ fun Boolean.isTrue(block: (Boolean) -> Unit) : Boolean {
  *
  * @return Boolean
  */
-fun Boolean.isFalse(block: (Boolean) -> Unit) : Boolean {
+fun Boolean.isFalse(block: (Boolean) -> Unit): Boolean {
     if (!this)
         block(this)
     return this

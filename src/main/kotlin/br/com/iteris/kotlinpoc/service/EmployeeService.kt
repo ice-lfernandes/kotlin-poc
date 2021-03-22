@@ -16,7 +16,7 @@ import kotlin.jvm.Throws
 @Service
 class EmployeeService {
 
-    private val log: Logger = LoggerFactory.getLogger(this.javaClass)
+    private val log: Logger = LoggerFactory.getLogger(EmployeeService::javaClass.name)
 
     @Autowired
     lateinit var employeeRepository: EmployeeRepository
@@ -44,7 +44,7 @@ class EmployeeService {
         }
     }
 
-    @Throws(Exception::class, NotFoundEntityException::class)
+    @Throws(FatalException::class, NotFoundEntityException::class)
     fun update(id: Long, employeeDTOForm: EmployeeDTO): EmployeeDTO {
         return employeeRepository.findById(id).map {
             try {
@@ -59,7 +59,7 @@ class EmployeeService {
         }.orElseThrow { throw NotFoundEntityException(message = "Employee Not Found") }
     }
 
-    @Throws(Exception::class, NotFoundEntityException::class)
+    @Throws(FatalException::class, NotFoundEntityException::class)
     fun delete(id: Long) {
         val optionalEmployee = employeeRepository.findById(id)
         optionalEmployee.ifPresentOrElse({ employee ->
