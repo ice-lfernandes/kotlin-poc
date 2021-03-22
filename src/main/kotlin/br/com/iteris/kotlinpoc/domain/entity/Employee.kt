@@ -5,12 +5,14 @@ import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
+import javax.validation.constraints.NotBlank
+import javax.validation.constraints.PositiveOrZero
 
 @Entity
 data class Employee(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
-        val id: Long = 0L,
-        val name: String = "",
-        val salary: BigDecimal = BigDecimal.ZERO
+        var id: Long? = null,
+        @field:NotBlank val name: String = "",
+        @field:PositiveOrZero val salary: BigDecimal = BigDecimal.ZERO
 )

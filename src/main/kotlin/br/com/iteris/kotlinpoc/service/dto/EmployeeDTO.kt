@@ -6,6 +6,6 @@ import javax.validation.constraints.PositiveOrZero
 
 data class EmployeeDTO(
         var id: Long? = null,
-        @field:NotBlank var name: String = "",
-        @field:PositiveOrZero var salary: BigDecimal = BigDecimal.ZERO
+        @field:NotBlank val name: String = "",
+        @field:PositiveOrZero val salary: BigDecimal = BigDecimal.ZERO
 )
