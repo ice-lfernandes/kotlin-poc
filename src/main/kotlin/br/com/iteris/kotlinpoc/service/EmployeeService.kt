@@ -16,7 +16,7 @@ import kotlin.jvm.Throws
 @Service
 class EmployeeService {
 
-    private val log: Logger = LoggerFactory.getLogger(EmployeeService::javaClass.name)
+    private val log: Logger = LoggerFactory.getLogger(EmployeeService::class.java.name)
 
     @Autowired
     lateinit var employeeRepository: EmployeeRepository
@@ -36,7 +36,7 @@ class EmployeeService {
     fun save(employeeDTOForm: EmployeeDTO): EmployeeDTO {
         try {
             val employeePersisted = employeeRepository.save(Mapper.convert(employeeDTOForm))
-            log.info("method=save, stage=employee-persisted-success, employ=$employeePersisted")
+            log.info("method=save, stage=employee-persisted-success, employee=$employeePersisted")
             return Mapper.convert(employeePersisted)
         } catch (exception: Exception) {
             log.error("method=save, stage=error-save-employee, employeeDTO=$employeeDTOForm, message=${exception.message}", exception)

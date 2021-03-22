@@ -25,7 +25,7 @@ const val PATH = "/employees"
 @RequestMapping(PATH)
 class EmployeeController {
 
-    private val log: Logger = LoggerFactory.getLogger(EmployeeController::javaClass.name)
+    private val log: Logger = LoggerFactory.getLogger(EmployeeController::class.java.name)
 
     @Autowired
     lateinit var employeeService: EmployeeService

@@ -1,10 +1,8 @@
 package br.com.iteris.kotlinpoc.domain.entity
 
 import java.math.BigDecimal
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
+import java.time.LocalDateTime
+import javax.persistence.*
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.PositiveOrZero
 
@@ -13,6 +11,17 @@ data class Employee(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         var id: Long? = null,
-        @field:NotBlank val name: String = "",
-        @field:PositiveOrZero val salary: BigDecimal = BigDecimal.ZERO
+
+        @Column(nullable = false)
+        val name: String = "",
+
+        @Column(nullable = false)
+        val salary: BigDecimal = BigDecimal.ZERO,
+
+        @Column(nullable = false)
+        val dateCreated: LocalDateTime = LocalDateTime.now(),
+
+        @JoinColumn(name = "id_departament")
+        @ManyToOne(fetch = FetchType.LAZY)
+        val departament: Departament
 )
