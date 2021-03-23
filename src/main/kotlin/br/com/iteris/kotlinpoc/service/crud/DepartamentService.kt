@@ -18,11 +18,7 @@ class DepartamentService(
 
     override var log: Logger = LoggerFactory.getLogger(DepartamentService::class.java)
 
-    override fun convertModelToDTO(entity: Departament): DepartamentDTO {
-        return Mapper.convert(entity)
-    }
+    override fun convertModelToDTO(entity: Departament): DepartamentDTO = Mapper.convert(entity)
 
-    override fun convertDTOToModel(dto: DepartamentDTO): Departament {
-        return Mapper.convert(dto)
-    }
+    override fun convertDTOToModel(dto: DepartamentDTO): Departament = Mapper.convert(dto)
 }
