@@ -1,5 +1,6 @@
 package br.com.iteris.kotlinpoc.domain.entity
 
+import br.com.iteris.kotlinpoc.utils.ZONE_ID_DEFAULT
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import javax.persistence.*
@@ -15,7 +16,7 @@ class Employee(
         val salary: BigDecimal = BigDecimal.ZERO,
 
         @Column(nullable = false)
-        val dateCreated: LocalDateTime = LocalDateTime.now(),
+        val dateCreated: LocalDateTime = LocalDateTime.now(ZONE_ID_DEFAULT),
 
         @JoinColumn(name = "id_departament")
         @ManyToOne(fetch = FetchType.LAZY)

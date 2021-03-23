@@ -7,3 +7,6 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.HSQLDialect
     hibernate.ddl-auto: update
+  h2:
+  console:
+    enabled: true

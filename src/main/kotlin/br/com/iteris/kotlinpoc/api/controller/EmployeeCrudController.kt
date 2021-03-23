@@ -2,7 +2,6 @@ package br.com.iteris.kotlinpoc.api.controller
 
 import br.com.iteris.kotlinpoc.service.crud.EmployeeService
 import br.com.iteris.kotlinpoc.service.crud.dto.EmployeeDTO
-import br.com.iteris.kotlinpoc.utils.Mapper
 import br.com.iteris.kotlinpoc.utils.convertStringToLong
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
