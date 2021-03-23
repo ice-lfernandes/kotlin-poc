@@ -1,13 +1,10 @@
 package br.com.iteris.kotlinpoc.api.controller
 
-import br.com.iteris.kotlinpoc.service.EmployeeService
-import br.com.iteris.kotlinpoc.service.dto.EmployeeDTO
+import br.com.iteris.kotlinpoc.service.crud.EmployeeService
+import br.com.iteris.kotlinpoc.service.crud.dto.EmployeeDTO
 import br.com.iteris.kotlinpoc.utils.Mapper
 import br.com.iteris.kotlinpoc.utils.convertStringToLong
 import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.media.ArraySchema
-import io.swagger.v3.oas.annotations.media.Content
-import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

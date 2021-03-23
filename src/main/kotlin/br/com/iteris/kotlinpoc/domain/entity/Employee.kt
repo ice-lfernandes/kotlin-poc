@@ -5,10 +5,8 @@ import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
-data class Employee(
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        var id: Long? = null,
+class Employee(
+        id: Long? = null,
 
         @Column(nullable = false)
         val name: String = "",
@@ -21,5 +19,19 @@ data class Employee(
 
         @JoinColumn(name = "id_departament")
         @ManyToOne(fetch = FetchType.LAZY)
-        val departament: Departament
-)
+        val departament: Departament? = null
+) : AbstractEntity(id) {
+
+    override fun equals(other: Any?): Boolean {
+        return super.equals(other) && other is Employee && name == other.name
+    }
+
+    override fun hashCode(): Int {
+        return super.hashCode() + name.hashCode()
+    }
+
+    override fun toString(): String {
+        return "${generateFieldSuperClassToString()} name='$name', salary=$salary, departament=$departament)"
+    }
+
+}

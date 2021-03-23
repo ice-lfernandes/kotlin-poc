@@ -1,11 +1,11 @@
-package br.com.iteris.kotlinpoc.service
+package br.com.iteris.kotlinpoc.service.crud
 
 import br.com.iteris.kotlinpoc.utils.Mapper
 import br.com.iteris.kotlinpoc.domain.entity.Employee
 import br.com.iteris.kotlinpoc.domain.repository.EmployeeRepository
 import br.com.iteris.kotlinpoc.exception.FatalException
 import br.com.iteris.kotlinpoc.exception.NotFoundEntityException
-import br.com.iteris.kotlinpoc.service.dto.EmployeeDTO
+import br.com.iteris.kotlinpoc.service.crud.dto.EmployeeDTO
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -21,20 +21,28 @@ class EmployeeService {
     @Autowired
     lateinit var employeeRepository: EmployeeRepository
 
-    fun findById(id: Long): Optional<EmployeeDTO> =
-            employeeRepository.findById(id).map { employee ->
-                log.info("method=findById, stage=employee-found, id=$id, employee=$employee")
-                Mapper.convert<Employee, EmployeeDTO>(employee).apply {
+    fun findById(id: Long): Optional<EmployeeDTO> {
+        return employeeRepository.findById(id).map { employee ->
+            log.info("method=findById, stage=employee-found, id=$id, employee=$employee")
+            Mapper.convert<Employee, EmployeeDTO>(employee).apply {
+                employee.departament?.let {
                     completeDepartamentName(Mapper.convert(employee.departament))
                 }
             }
+        }
+    }
 
-    fun findAll(): List<EmployeeDTO> =
-            employeeRepository.findAll().map { employee ->
-                Mapper.convert<Employee, EmployeeDTO>(employee).apply {
+
+    fun findAll(): List<EmployeeDTO> {
+        return employeeRepository.findAll().map { employee ->
+            Mapper.convert<Employee, EmployeeDTO>(employee).apply {
+                employee.departament?.let {
                     completeDepartamentName(Mapper.convert(employee.departament))
                 }
             }
+        }
+
+    }
 
     @Throws(FatalException::class)
     fun save(employeeDTOForm: EmployeeDTO): EmployeeDTO {
@@ -42,7 +50,9 @@ class EmployeeService {
             val employeePersisted = employeeRepository.save(Mapper.convert(employeeDTOForm))
             log.info("method=save, stage=employee-persisted-success, employee=$employeePersisted")
             return Mapper.convert<Employee, EmployeeDTO>(employeePersisted).apply {
-                completeDepartamentName(Mapper.convert(employeePersisted.departament))
+                employeePersisted.departament?.let {
+                    completeDepartamentName(Mapper.convert(employeePersisted.departament))
+                }
             }
         } catch (exception: Exception) {
             log.error("method=save, stage=error-save-employee, employeeDTO=$employeeDTOForm, message=${exception.message}", exception)
@@ -58,7 +68,9 @@ class EmployeeService {
                 val employeePersisted = employeeRepository.save(Mapper.convert(employeeDTOForm))
                 log.info("method=save, stage=employee-persisted-success, employ=$employeePersisted")
                 Mapper.convert<Employee, EmployeeDTO>(employeePersisted).apply {
-                    completeDepartamentName(Mapper.convert(employeePersisted.departament))
+                    employeePersisted.departament?.let {
+                        completeDepartamentName(Mapper.convert(employeePersisted.departament))
+                    }
                 }
             } catch (exception: Exception) {
                 log.error("method=save, stage=error-save-employee, employeeDTO=$employeeDTOForm, message=${exception.message}", exception)
