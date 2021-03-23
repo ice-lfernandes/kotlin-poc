@@ -16,10 +16,10 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
 import javax.validation.Valid
 
-const val PATH = "/employees"
+const val PATH_EMPLOYEES = "/employees"
 
 @RestController
-@RequestMapping(PATH)
+@RequestMapping(PATH_EMPLOYEES)
 class EmployeeController {
 
     private val log: Logger = LoggerFactory.getLogger(EmployeeController::class.java.name)
@@ -57,8 +57,8 @@ class EmployeeController {
             uriComponentBuilder: UriComponentsBuilder,
     ): ResponseEntity<EmployeeDTO> {
         val employeeSaved = employeeService.save(employeeDTO)
-        val uri = uriComponentBuilder.path("$PATH/{id}").buildAndExpand(employeeSaved.id).toUri()
-        return ResponseEntity.created(uri).body(Mapper.convert(employeeSaved))
+        val uri = uriComponentBuilder.path("$PATH_DEPARTAMENTS/{id}").buildAndExpand(employeeSaved.id).toUri()
+        return ResponseEntity.created(uri).body(employeeSaved)
     }
 
     @Operation(summary = "Put Employee")

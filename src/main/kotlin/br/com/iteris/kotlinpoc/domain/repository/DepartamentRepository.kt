@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository
 import java.util.*
 
 @Repository
-interface DepartamentRepository : CrudRepository<Departament, Long> {
+interface DepartamentRepository<T, U> : CrudRepository<Departament, Long> {
 
     fun findByName(name: String) : Optional<Departament>
 
