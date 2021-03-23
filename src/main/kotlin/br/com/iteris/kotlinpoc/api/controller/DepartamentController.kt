@@ -2,7 +2,6 @@ package br.com.iteris.kotlinpoc.api.controller
 
 import br.com.iteris.kotlinpoc.service.crud.DepartamentService
 import br.com.iteris.kotlinpoc.service.crud.dto.DepartamentDTO
-import br.com.iteris.kotlinpoc.service.crud.dto.EmployeeDTO
 import br.com.iteris.kotlinpoc.utils.Mapper
 import br.com.iteris.kotlinpoc.utils.convertStringToLong
 import io.swagger.v3.oas.annotations.Operation
@@ -56,10 +55,25 @@ class DepartamentController {
     fun postDepartament(
             @Valid @RequestBody departamentDTO: DepartamentDTO,
             uriComponentBuilder: UriComponentsBuilder,
-    ): ResponseEntity<EmployeeDTO> {
+    ): ResponseEntity<DepartamentDTO> {
         val departamentSaved = departamentService.save(departamentDTO)
         val uri = uriComponentBuilder.path("$PATH_DEPARTAMENTS/{id}").buildAndExpand(departamentSaved.id).toUri()
         return ResponseEntity.created(uri).body(Mapper.convert(departamentSaved))
+    }
+
+    @Operation(summary = "Put Departament")
+    @ApiResponse(responseCode = "200", description = "Departament Updated")
+    @PutMapping("/{id}", consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun putEmployee(@PathVariable id: String, @Valid @RequestBody departamentDTO: DepartamentDTO): ResponseEntity<DepartamentDTO> {
+        val idLong: Long? = convertStringToLong(id) { exception ->
+            log.error(exception.message, exception)
+        }
+
+        idLong?.let {
+            return ResponseEntity.ok(departamentService.update(it, departamentDTO))
+        }
+
+        return ResponseEntity(HttpStatus.BAD_REQUEST)
     }
 
     @Operation(summary = "Delete Departaments")
