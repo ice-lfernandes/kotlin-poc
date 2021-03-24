@@ -25,7 +25,7 @@ class DepartamentController {
     private val log: Logger = LoggerFactory.getLogger(DepartamentController::class.java.name)
 
     @Autowired
-    lateinit var departamentService: DepartamentService
+    private lateinit var departamentService: DepartamentService
 
     @Operation(summary = "Get Departament by Id")
     @ApiResponse(responseCode = "200", description = "Found Departament")

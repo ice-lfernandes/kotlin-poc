@@ -10,7 +10,7 @@ import java.util.*
 import kotlin.jvm.Throws
 
 abstract class AbstractCrudService<T : AbstractEntity, V : DTO>(
-        protected var repository: CrudRepository<T, Long>
+        private var repository: CrudRepository<T, Long>
 ) {
 
     protected open lateinit var log: Logger
