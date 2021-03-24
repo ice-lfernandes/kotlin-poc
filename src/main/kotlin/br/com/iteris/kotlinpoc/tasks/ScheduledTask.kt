@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import java.util.*
-import java.util.Objects.isNull
 
 @Component
 class ScheduledTask {
@@ -30,14 +29,9 @@ class ScheduledTask {
         var index = Random().nextInt(listEmployee.size)
         val employee = listEmployee[index]
 
-        val listOfTypePoint = listOf(TypePoint.ENTRY, TypePoint.EXIT)
-        index = Random().nextInt(listOfTypePoint.size)
-        val typePoint = listOfTypePoint[index]
-
         try {
             eletronicPointService.applyEletronicPointForEmployee(
-                    employee = Mapper.convert(employee),
-                    typePoint = typePoint
+                    employee = Mapper.convert(employee)
             )
         } catch (exception: FatalException) {
             log.error(exception.message)

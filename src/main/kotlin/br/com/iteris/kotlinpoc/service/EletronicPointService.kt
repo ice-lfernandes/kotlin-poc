@@ -7,7 +7,6 @@ import br.com.iteris.kotlinpoc.domain.repository.EletronicPointRepository
 import br.com.iteris.kotlinpoc.exception.FatalException
 import br.com.iteris.kotlinpoc.utils.ZONE_ID_DEFAULT
 import br.com.iteris.kotlinpoc.utils.extensions.formatStringByPattern
-import br.com.iteris.kotlinpoc.utils.extensions.isTrue
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -23,22 +22,40 @@ class EletronicPointService {
     @Autowired
     private lateinit var eletronicPointRepository: EletronicPointRepository
 
-    fun applyEletronicPointForEmployee(employee: Employee, typePoint: TypePoint): EletronicPoint {
-        val dateTime = LocalDateTime.now(ZONE_ID_DEFAULT).truncatedTo(ChronoUnit.SECONDS)
+    /**
+     *
+     * Realiza Controle de Batimento de Pontos dos Funcionários.
+     * Caso 1: O funcionário não tenha batido ponto para a data atual do sistema, computar o ponto de entada.
+     * Caso 2: O funcionário já tem uma batida de ponto para a data atual do sistema, computar o ponto de saída.
+     * Caso 3: O funcionário já tem as batidas de entrada e saída para a data atual do sistema, retornar @throws FatalException.
+     *
+     * @param [employee] employee
+     * @return [EletronicPoint] eletronicPoint
+     * @throws [FatalException] exception
+     */
+    fun applyEletronicPointForEmployee(employee: Employee): EletronicPoint {
+        val dateTime = LocalDateTime.now(ZONE_ID_DEFAULT).truncatedTo(ChronoUnit.DAYS)
         employee.id?.let {
-            eletronicPointRepository.existsEletronicPointByEmployeeWithSameDateAndTypePoint(it, typePoint.ordinal, dateTime.formatStringByPattern())
-                    .isTrue {
-                        val msg = "Funcionário ja possui batimento de ${typePoint.description} para a data: $dateTime"
-                        log.error("M=applyEletronicPointForEmployee, stage=apply-eletronic-point-error, batida=${typePoint.description}, employee=$employee, msg=$msg")
-                        throw FatalException("O ponto de ${typePoint.description} do funcionário ${employee.name} não pode ser criado, pois já existe")
+            eletronicPointRepository.existsEletronicPointByEmployeeWithSameDate(it, dateTime.formatStringByPattern())
+                    .ifEmpty {
+                        return createEletronicPoint(employee, TypePoint.ENTRY, dateTime)
+                    }.run {
+                        this.filter { eletronicPoint -> eletronicPoint.typePoint == TypePoint.EXIT }
+                                .ifEmpty {
+                                    return createEletronicPoint(employee, TypePoint.EXIT, dateTime)
+                                }
+                        throw FatalException("O Funcionário: ${employee.name} já bateu os pontos de Entrada e Saída para a data: ${dateTime.formatStringByPattern("dd/MM/yyyy")}")
                     }
-            return EletronicPoint(employee = employee, typePoint = typePoint, dateTime = dateTime).run {
-                val msg = "Batimento de ${typePoint.description} efetuado com sucesso"
-                log.info("M=applyEletronicPointForEmployee, stage=apply-eletronic-point-success, employee=$employee, msg=$msg")
-                eletronicPointRepository.save(this)
-            }
         }
-        throw FatalException("O Funcionário não tem id válido, logo não está persistido")
+        throw FatalException("O Funcionário: ${employee.name} não tem id válido, logo não está persistido")
+    }
+
+    private fun createEletronicPoint(employee: Employee, typePoint: TypePoint, dateTime: LocalDateTime): EletronicPoint {
+        return EletronicPoint(employee = employee, typePoint = typePoint, dateTime = dateTime).run {
+            val msg = "Batimento de ${typePoint.description} efetuado com sucesso"
+            log.info("M=applyEletronicPointForEmployee, stage=apply-eletronic-point-success, employee=$employee, msg=$msg")
+            eletronicPointRepository.save(this)
+        }
     }
 
 }
